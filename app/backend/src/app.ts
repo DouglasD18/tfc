@@ -1,4 +1,6 @@
 import * as express from 'express';
+import errorMidlleware from './midllewares/Error.midlleware';
+import LoginRoute from './routes/Login.route';
 
 class App {
   public app: express.Express;
@@ -10,6 +12,7 @@ class App {
 
     // Não remover essa rota
     this.app.get('/', (req, res) => res.json({ ok: true }));
+    this.app.use(errorMidlleware);
   }
 
   private config():void {
@@ -22,6 +25,8 @@ class App {
 
     this.app.use(express.json());
     this.app.use(accessControl);
+
+    this.app.use('/login', LoginRoute);
   }
 
   public start(PORT: string | number):void {
