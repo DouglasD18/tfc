@@ -17,16 +17,16 @@ class LoginService {
 
     const { error } = schema.validate(user);
 
-    if (error) return throwError('badRequest', 'Invalid Body!');
+    if (error) return throwError('badRequest', 'All fields must be filled');
   }
 
   static async userValidate(user: ILogin): Promise<void> {
     const { email, password } = user;
     const emailValidation = await Users.findOne({ where: { email } });
-    if (emailValidation === null) throwError('unauthorized', 'Invalid User!');
+    if (emailValidation === null) throwError('unauthorized', 'Incorrect email or password');
     else {
       const passwordValidation = bcrypt.compareSync(password, emailValidation.password);
-      if (passwordValidation === null) throwError('unauthorized', 'Invalid User!');
+      if (passwordValidation === null) throwError('unauthorized', 'Incorrect email or password');
     }
   }
 
