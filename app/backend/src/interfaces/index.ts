@@ -1,3 +1,12 @@
+import { Request } from 'express';
+
+export interface IEmail {
+  email: string,
+}
+
+export interface IUserRequest extends Request {
+  user?: IEmail,
+}
 export interface ILogin {
   email: string,
   password: string,
@@ -5,5 +14,14 @@ export interface ILogin {
 
 export interface IHttpReturn {
   code: number,
-  token: string,
+  token?: string,
+  role?: string,
 }
+
+// export interface IUser {
+//   id?: number,
+//   username: string;
+//   role: string;
+//   email: string;
+//   password: string;
+// }

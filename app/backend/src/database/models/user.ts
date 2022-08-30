@@ -17,15 +17,15 @@ Users.init({
     autoIncrement: true,
   },
   username: {
-    type: STRING(30),
+    type: STRING(100),
     allowNull: false,
   },
   role: {
-    type: STRING(30),
+    type: STRING(100),
     allowNull: false,
   },
   email: {
-    type: STRING(50),
+    type: STRING(100),
     allowNull: false,
   },
   password: {

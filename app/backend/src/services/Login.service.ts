@@ -36,6 +36,14 @@ class LoginService {
     const token = jwt.sign({ data: user }, secret);
     return { code: 200, token };
   }
+
+  static async getRole(email: string): Promise<IHttpReturn> {
+    const user = await Users.findOne({ where: { email } });
+
+    const { role } = user as Users;
+
+    return { code: 200, role };
+  }
 }
 
 export default LoginService;
