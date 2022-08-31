@@ -18,6 +18,11 @@ export interface IHttpReturn {
   role?: string,
 }
 
+export interface IVerify {
+  data: ILogin,
+  iat: number,
+}
+
 // export interface IUser {
 //   id?: number,
 //   username: string;
