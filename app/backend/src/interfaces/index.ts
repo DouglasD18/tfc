@@ -16,6 +16,7 @@ export interface IHttpReturn {
   code: number,
   token?: string,
   role?: string,
+  result?: [object],
 }
 
 export interface IVerify {
