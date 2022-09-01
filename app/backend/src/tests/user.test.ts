@@ -19,12 +19,6 @@ const userMock: IUser = {
 
 describe('Users', () => {
   describe('login', () => {
-    beforeEach(() => Sinon.stub(Users, "findOne").resolves())
-
-    afterEach(() => {
-      Sinon.restore();
-    })
-
     it('Should return status 200', async () => {
       const response = await chai.request(app)
         .post('/login')
@@ -38,6 +32,8 @@ describe('Users', () => {
   })
 
   describe('getRole', () => {
+    beforeEach(() => Sinon.stub(Users, "findOne").resolves(userMock as Users))
+
     afterEach(() => {
       Sinon.restore();
     })
