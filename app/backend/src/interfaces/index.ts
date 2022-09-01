@@ -17,12 +17,29 @@ export interface ITeam {
   teamName: string,
 }
 
+export interface IMatch {
+  id: number;
+  homeTeam: number;
+  homeTeamGoals: number;
+  awayTeam: number;
+  awayTeamGoals: number;
+  inProgress: boolean;
+  teamHome: {
+    teamName: string,
+  },
+  teamAway: {
+    teamName: string
+  }
+}
+
 export interface IHttpReturn {
   code: number,
   token?: string,
   role?: string,
-  result?: [ITeam],
+  result?: ITeam[],
   team?: ITeam,
+  matches?: IMatch[],
+  match?: IMatch,
 }
 
 export interface IVerify {
