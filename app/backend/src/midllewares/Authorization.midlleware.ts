@@ -5,7 +5,7 @@ import throwError from '../utils/throwError';
 
 const secret = process.env.JWT_SECRET || 'jwt_secret';
 
-const Authorization = (req: IUserRequest, res: Response, next: NextFunction) => {
+const Authorization = (req: IUserRequest, _res: Response, next: NextFunction) => {
   const token = req.headers.authorization;
 
   if (!token) return throwError('unauthorized', 'Token not found!');

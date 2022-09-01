@@ -18,12 +18,15 @@ export interface ITeam {
 }
 
 export interface IMatch {
-  id: number;
+  id?: number;
   homeTeam: number;
   homeTeamGoals: number;
   awayTeam: number;
   awayTeamGoals: number;
-  inProgress: boolean;
+  inProgress?: boolean;
+}
+
+export interface IMatchReturn extends IMatch {
   teamHome: {
     teamName: string,
   },
@@ -38,7 +41,8 @@ export interface IHttpReturn {
   role?: string,
   result?: ITeam[],
   team?: ITeam,
-  matches?: IMatch[],
+  matches?: IMatchReturn[],
+  matchReturn?: IMatchReturn,
   match?: IMatch,
 }
 

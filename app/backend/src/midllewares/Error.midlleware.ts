@@ -4,6 +4,7 @@ const errors: Record<string, number> = {
   badRequest: 400,
   unauthorized: 401,
   notFound: 404,
+  notAcceptable: 406,
 };
 
 const errorMidlleware: ErrorRequestHandler = (err, _res, res, _next) => {
