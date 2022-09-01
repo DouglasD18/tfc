@@ -12,11 +12,17 @@ export interface ILogin {
   password: string,
 }
 
+export interface ITeam {
+  id: number,
+  teamName: string,
+}
+
 export interface IHttpReturn {
   code: number,
   token?: string,
   role?: string,
-  result?: [object],
+  result?: [ITeam],
+  team?: ITeam,
 }
 
 export interface IVerify {
