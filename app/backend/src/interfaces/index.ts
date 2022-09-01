@@ -38,6 +38,7 @@ export interface IMatchReturn extends IMatch {
 export interface IHttpReturn {
   code: number,
   token?: string,
+  message?: string,
   role?: string,
   result?: ITeam[],
   team?: ITeam,

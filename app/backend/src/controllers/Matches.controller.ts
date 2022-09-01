@@ -2,8 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import MatchesService from '../services/Matches.service';
 
 class MatchesController {
-  static async list(_req: Request, res: Response) {
-    // const { inProgress } = req.query;
+  static async list(req: Request, res: Response) {
+    const { inProgress } = req.query;
+    if (inProgress !== undefined) {
+      const response = await MatchesService.listWithFilter(inProgress.toString());
+      const { code, matches } = response;
+
+      return res.status(code).json(matches);
+    }
     const response = await MatchesService.list();
     const { code, matches } = response;
 
@@ -21,6 +27,14 @@ class MatchesController {
     } catch (error) {
       next(error);
     }
+  }
+
+  static async updateMatch(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    const response = await MatchesService.updateMatches(id);
+
+    const { code, message } = response;
+    return res.status(code).json({ message });
   }
 }
 

@@ -5,6 +5,7 @@ import MatchesController from '../controllers/Matches.controller';
 const MatchesRoute = Router();
 
 MatchesRoute.get('/', MatchesController.list);
+MatchesRoute.patch('/:id/finish', Authorization, MatchesController.updateMatch);
 MatchesRoute.post('/', Authorization, MatchesController.createMatch);
 
 export default MatchesRoute;
