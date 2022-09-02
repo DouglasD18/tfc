@@ -37,13 +37,17 @@ class MatchesController {
     return res.status(code).json({ message });
   }
 
-  static async updateMatch(req: Request, res: Response) {
+  static async updateMatch(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
     const { homeTeamGoals, awayTeamGoals } = req.body;
-    const response = await MatchesService.updateMatch(id, homeTeamGoals, awayTeamGoals);
+    try {
+      const response = await MatchesService.updateMatch(id, homeTeamGoals, awayTeamGoals);
 
-    const { code } = response;
-    return res.status(code).end();
+      const { code } = response;
+      return res.status(code).json({ message: 'Match updated' });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

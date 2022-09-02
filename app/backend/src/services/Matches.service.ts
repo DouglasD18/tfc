@@ -72,7 +72,18 @@ class MatchesService {
     return { code: 200, message: 'Finished' };
   }
 
+  static async isInProgress(id: number): Promise<void> {
+    const match = await Matches.findOne({ where: { id } });
+    if (!match) return throwError('notFound', 'Match not found!');
+    const { inProgress } = match;
+    if (!inProgress) {
+      const message = 'It is not possible to change finished matches';
+      return throwError('unauthorized', message);
+    }
+  }
+
   static async updateMatch(id: number, home: string, away: string): Promise<IHttpReturn> {
+    await this.isInProgress(id);
     const homeTeamGoals = Number(home);
     const awayTeamGoals = Number(away);
     await Matches.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
