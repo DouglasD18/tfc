@@ -66,10 +66,18 @@ class MatchesService {
     }
   }
 
-  static async updateMatches(id: number): Promise<IHttpReturn> {
+  static async updateMatchFinish(id: number): Promise<IHttpReturn> {
     await Matches.update({ inProgress: false }, { where: { id } });
 
     return { code: 200, message: 'Finished' };
+  }
+
+  static async updateMatch(id: number, home: string, away: string): Promise<IHttpReturn> {
+    const homeTeamGoals = Number(home);
+    const awayTeamGoals = Number(away);
+    await Matches.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
+
+    return { code: 200 };
   }
 }
 

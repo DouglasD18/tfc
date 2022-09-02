@@ -29,12 +29,21 @@ class MatchesController {
     }
   }
 
-  static async updateMatch(req: Request, res: Response) {
+  static async updateMatchFinish(req: Request, res: Response) {
     const id = Number(req.params.id);
-    const response = await MatchesService.updateMatches(id);
+    const response = await MatchesService.updateMatchFinish(id);
 
     const { code, message } = response;
     return res.status(code).json({ message });
+  }
+
+  static async updateMatch(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    const { homeTeamGoals, awayTeamGoals } = req.body;
+    const response = await MatchesService.updateMatch(id, homeTeamGoals, awayTeamGoals);
+
+    const { code } = response;
+    return res.status(code).end();
   }
 }
 
