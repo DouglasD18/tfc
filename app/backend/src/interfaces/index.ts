@@ -35,6 +35,20 @@ export interface IMatchReturn extends IMatch {
   }
 }
 
+export interface ITeamClassification {
+  classification: number,
+  team: string,
+  points: number,
+  matches: number,
+  wins: number,
+  draws: number,
+  losses: number,
+  goalsScored: number,
+  goalsConceded: number,
+  goalDifference: number,
+  percent: number,
+}
+
 export interface IHttpReturn {
   code: number,
   token?: string,
