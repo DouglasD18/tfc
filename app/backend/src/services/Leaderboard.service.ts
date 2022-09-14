@@ -9,52 +9,40 @@ type goalsObject = {
 };
 
 class LeaderboardService {
-  static matchPoints(match: IMatch, isHome: boolean): number {
-    const { homeTeamGoals, awayTeamGoals } = match;
-    const result = homeTeamGoals - awayTeamGoals;
-    if (isHome) {
-      if (result > 0) {
-        return 3;
-      } if (result < 0) {
-        return 0;
-      }
-      return 1;
-    }
-    if (result < 0) {
-      return 3;
-    } if (result > 0) {
-      return 0;
-    }
-    return 1;
-  }
-
-  static calcPoints(matches: IMatch[], id: number): number {
+  static calcPoints(matches: IMatch[], id: number, isHome: boolean): number {
     let totalPoints = 0;
     matches.forEach((match) => {
-      let isHome;
-      if (match.homeTeam === id) {
-        isHome = true;
-      } else {
-        isHome = false;
+      const result = match.homeTeamGoals - match.awayTeamGoals;
+      if (match.homeTeam === id && isHome) {
+        if (result > 0) {
+          totalPoints += 3;
+        } if (result === 0) {
+          totalPoints += 1;
+        }
+      } if (match.awayTeam === id && !isHome) {
+        if (result < 0) {
+          totalPoints += 3;
+        } if (result === 0) {
+          totalPoints += 1;
+        }
       }
-      totalPoints += this.matchPoints(match, isHome);
     });
     return totalPoints;
   }
 
-  static calcPercent(matches: IMatch[], totalPoints: number): number {
-    const percent = totalPoints / (matches.length * 3) / 100;
+  static calcPercent(totalGames: number, totalPoints: number): number {
+    const percent = (totalPoints / (totalGames * 3)) * 100;
     return Number(percent.toFixed(2));
   }
 
-  static calcGoalsdifferenc(matches: IMatch[], id: number): goalsObject {
+  static calcGoalsdifferenc(matches: IMatch[], id: number, isHome: boolean): goalsObject {
     let goalsFavor = 0;
     let goalsOwn = 0;
     matches.forEach((match) => {
-      if (match.homeTeam === id) {
+      if (match.homeTeam === id && isHome) {
         goalsFavor += match.homeTeamGoals;
         goalsOwn += match.awayTeamGoals;
-      } else {
+      } if (match.awayTeam === id && !isHome) {
         goalsFavor += match.awayTeamGoals;
         goalsOwn += match.homeTeamGoals;
       }
@@ -63,116 +51,92 @@ class LeaderboardService {
     return { goalsBalance, goalsFavor, goalsOwn };
   }
 
-  static calcWins(matches: IMatch[], id: number): number {
+  static calcWins(matches: IMatch[], id: number, isHome: boolean): number {
     let wins = 0;
     matches.forEach((match) => {
-      const { homeTeam, homeTeamGoals, awayTeamGoals } = match;
-      if (homeTeam === id && homeTeamGoals > awayTeamGoals) {
+      const { homeTeam, homeTeamGoals, awayTeam, awayTeamGoals } = match;
+      if (homeTeam === id && homeTeamGoals > awayTeamGoals && isHome) {
         wins += 1;
-      } if (homeTeam !== id && homeTeamGoals < awayTeamGoals) {
+      } if (awayTeam === id && homeTeamGoals < awayTeamGoals && !isHome) {
         wins += 1;
       }
     });
     return wins;
   }
 
-  static calcDraws(matches: IMatch[]): number {
+  static calcDraws(matches: IMatch[], id: number, isHome: boolean): number {
     let draws = 0;
     matches.forEach((match) => {
-      const { homeTeamGoals, awayTeamGoals } = match;
-      if (homeTeamGoals === awayTeamGoals) {
+      const { homeTeam, homeTeamGoals, awayTeam, awayTeamGoals } = match;
+      if (homeTeamGoals === awayTeamGoals && (homeTeam === id || awayTeam === id) && isHome) {
+        draws += 1;
+      } if (homeTeamGoals === awayTeamGoals && (homeTeam === id || awayTeam === id) && !isHome) {
         draws += 1;
       }
     });
     return draws;
   }
 
-  static calcLosses(matches: IMatch[], id: number): number {
+  static calcLosses(matches: IMatch[], id: number, isHome: boolean): number {
     let losses = 0;
     matches.forEach((match) => {
-      const { homeTeam, homeTeamGoals, awayTeamGoals } = match;
-      if (homeTeam === id && homeTeamGoals < awayTeamGoals) {
+      const { homeTeam, homeTeamGoals, awayTeam, awayTeamGoals } = match;
+      if (homeTeam === id && homeTeamGoals < awayTeamGoals && isHome) {
         losses += 1;
-      } if (homeTeam !== id && homeTeamGoals > awayTeamGoals) {
+      } if (awayTeam === id && homeTeamGoals > awayTeamGoals && !isHome) {
         losses += 1;
       }
     });
     return losses;
   }
 
-  static async createTeamObject(matches: IMatch[], id: number): Promise<ITeamClassification> {
-    const team = await Teams.findByPk(id);
+  static calcTotalGames(matches: IMatch[], id: number, isHome: boolean): number {
+    let totalMatches = 0;
+    matches.forEach((match) => {
+      if (match.homeTeam === id && isHome) {
+        totalMatches += 1;
+      }
+      if (match.awayTeam === id && !isHome) {
+        totalMatches += 1;
+      }
+    });
+    return totalMatches;
+  }
+
+  static async createTeamObject(matches: IMatch[], id: number, isHome: boolean):
+  Promise<ITeamClassification> {
+    const team = await Teams.findOne({ where: { id } });
     const name = team?.teamName;
-    const totalPoints = this.calcPoints(matches, id);
-    const totalGames = matches.length;
-    const totalVictories = this.calcWins(matches, id);
-    const totalDraws = this.calcDraws(matches);
-    const totalLosses = this.calcLosses(matches, id);
-    const { goalsFavor, goalsBalance, goalsOwn } = this.calcGoalsdifferenc(matches, id);
-    const efficiency = this.calcPercent(matches, totalPoints);
+    const totalPoints = this.calcPoints(matches, id, isHome);
+    const totalGames = this.calcTotalGames(matches, id, isHome);
+    const totalVictories = this.calcWins(matches, id, isHome);
+    const totalDraws = this.calcDraws(matches, id, isHome);
+    const totalLosses = this.calcLosses(matches, id, isHome);
+    const { goalsFavor, goalsBalance, goalsOwn } = this.calcGoalsdifferenc(matches, id, isHome);
+    const efficiency = this.calcPercent(totalGames, totalPoints);
     const firts = { name, totalPoints, totalGames, totalVictories, totalDraws };
     const second = { totalLosses, goalsFavor, goalsOwn, goalsBalance, efficiency };
     return { ...firts, ...second } as ITeamClassification;
   }
 
-  static sortByPoints(value1: ITeamClassification, value2: ITeamClassification): number {
-    if (value1.totalPoints > value2.totalPoints) {
-      return 1;
-    } if (value1.totalPoints < value2.totalPoints) {
-      return -1;
-    }
-    return 0;
+  static sortClassification(classification: ITeamClassification[]): ITeamClassification[] {
+    const sorted = classification.sort((home, away) => away.totalPoints - home.totalPoints
+    || away.totalVictories - home.totalVictories
+    || away.goalsBalance - home.goalsBalance
+    || away.goalsFavor - home.goalsFavor
+    || home.goalsOwn - away.goalsOwn);
+    return sorted;
   }
 
-  static sortByWins(value1: ITeamClassification, value2: ITeamClassification): number {
-    if (value1.totalVictories > value2.totalVictories) {
-      return 1;
-    } if (value1.totalVictories < value2.totalVictories) {
-      return -1;
-    }
-    return 0;
-  }
-
-  static sortByGoalsBalance(value1: ITeamClassification, value2: ITeamClassification): number {
-    if (value1.goalsBalance > value2.goalsBalance) {
-      return 1;
-    } if (value1.goalsBalance < value2.goalsBalance) {
-      return -1;
-    }
-    return 0;
-  }
-
-  static sortByGoalsFavor(value1: ITeamClassification, value2: ITeamClassification): number {
-    if (value1.goalsFavor > value2.goalsFavor) {
-      return 1;
-    } if (value1.goalsFavor < value2.goalsFavor) {
-      return -1;
-    }
-    return 0;
-  }
-
-  static sortByGoalsOwn(value1: ITeamClassification, value2: ITeamClassification): number {
-    if (value1.goalsOwn > value2.goalsOwn) {
-      return -1;
-    } if (value1.goalsOwn < value2.goalsOwn) {
-      return 1;
-    }
-    return 0;
-  }
-
-  static async classification(): Promise<ITeamClassification[]> {
+  static async classification(isHome: boolean): Promise<ITeamClassification[]> {
     const teams = await Teams.findAll();
-    const matches = await Matches.findAll();
+    const matches = await Matches.findAll({ where: { inProgress: false } });
     const classification = await Promise.all(teams.map(async (team) => {
-      const teamObject = await this.createTeamObject(matches, team.id);
+      const teamObject = await this.createTeamObject(matches, team.id, isHome);
       return teamObject;
     }));
-    classification.sort(this.sortByPoints);
-    classification.sort(this.sortByWins);
-    classification.sort(this.sortByGoalsBalance);
-    classification.sort(this.sortByGoalsFavor);
-    classification.sort(this.sortByGoalsOwn);
-    return classification;
+    const sortedClassification = this.sortClassification(classification);
+    return sortedClassification;
   }
 }
 

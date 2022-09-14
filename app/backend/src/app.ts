@@ -1,5 +1,6 @@
 import * as express from 'express';
 import errorMidlleware from './midllewares/Error.midlleware';
+import LeaderboardRoute from './routes/Leaderboard.route';
 import LoginRoute from './routes/Login.route';
 import MatchesRoute from './routes/Matches.route';
 import TeamsRoute from './routes/Teams.route';
@@ -31,6 +32,7 @@ class App {
     this.app.use('/login', LoginRoute);
     this.app.use('/teams', TeamsRoute);
     this.app.use('/matches', MatchesRoute);
+    this.app.use('/leaderboard', LeaderboardRoute);
   }
 
   public start(PORT: string | number):void {
