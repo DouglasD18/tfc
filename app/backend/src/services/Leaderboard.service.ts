@@ -68,9 +68,9 @@ class LeaderboardService {
     let draws = 0;
     matches.forEach((match) => {
       const { homeTeam, homeTeamGoals, awayTeam, awayTeamGoals } = match;
-      if (homeTeamGoals === awayTeamGoals && (homeTeam === id || awayTeam === id) && isHome) {
+      if (homeTeamGoals === awayTeamGoals && homeTeam === id && isHome) {
         draws += 1;
-      } if (homeTeamGoals === awayTeamGoals && (homeTeam === id || awayTeam === id) && !isHome) {
+      } if (homeTeamGoals === awayTeamGoals && awayTeam === id && !isHome) {
         draws += 1;
       }
     });
