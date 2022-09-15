@@ -4,6 +4,7 @@ import LeaderboardController from '../controllers/Leaderboard.controller';
 
 const LeaderboardRoute = Router();
 
-LeaderboardRoute.get('/home', LeaderboardController.list);
+LeaderboardRoute.get('/home', LeaderboardController.listHome);
+LeaderboardRoute.get('/away', LeaderboardController.listAway);
 
 export default LeaderboardRoute;
